@@ -2,7 +2,7 @@
 
 # update-archives.rb: Creates or updates the cron jobs which generate/maintain the archives
 #
-# Version 0.1 (2012-06-17)
+# Version 0.1 (2012-07-07)
 # Written by Christopher Thielen (cthielen@gmail.com)
 
 # Requirements:
@@ -24,7 +24,24 @@ show_blocklist = ["Joe Frank", "Democracy Now: The War & Peace Report", "Free Sp
 
 # Ensures the necessary command-line tools are installed
 def check_requirements
-
+  # fIcy is used to rip the stream
+  if which('fIcy') == nil
+    puts "You do not appear to have fIcy installed. Please correct this."
+    puts "A copy of fIcy is located in the tools/ directory of this script's source distribution."
+    abort
+  end
+  # fResync is recommended by fIcy before tagging
+  if which('fReSync') == nil
+    puts "You do not appear to have fResync installed. Please correct this."
+    puts "A copy of fResync (included with fIcy) is located in the tools/ directory of this script's source distribution."
+    abort
+  end
+  # id3tool is used to tag the MP3s
+  if which('id3tool') == nil
+    puts "You do not appear to have id3tool installed. Please correct this."
+    puts "A copy of id3tool is located in the tools/ directory of this script's source distribution."
+    abort
+  end
 end
 
 # Generates the cronjobs necessary to archive the given show
@@ -37,6 +54,20 @@ def generate_cronjob(show)
   pp filename
 end
 
+# Cross-platform way of finding an executable in the $PATH.
+# (Taken from http://stackoverflow.com/questions/2108727/which-in-ruby-checking-if-program-exists-in-path-from-ruby)
+#
+#   which('ruby') #=> /usr/bin/ruby
+def which(cmd)
+  exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
+  ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
+    exts.each { |ext|
+      exe = "#{path}/#{cmd}#{ext}"
+      return exe if File.executable? exe
+    }
+  end
+  return nil
+end
 
 
 ## Main script body
@@ -58,19 +89,4 @@ schedule.each do |entry|
   unless show_blocklist.include? show["show_name"]
     generate_cronjob(show)
   end
-end
-
-# Cross-platform way of finding an executable in the $PATH.
-# (Taken from http://stackoverflow.com/questions/2108727/which-in-ruby-checking-if-program-exists-in-path-from-ruby)
-#
-#   which('ruby') #=> /usr/bin/ruby
-def which(cmd)
-  exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
-  ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
-    exts.each { |ext|
-      exe = "#{path}/#{cmd}#{ext}"
-      return exe if File.executable? exe
-    }
-  end
-  return nil
 end
