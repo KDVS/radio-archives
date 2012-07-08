@@ -1,0 +1,8 @@
+Note that this source distribution contains additional, unrelated source distributions, found
+in the tools/ directory. Please see their contents for information on the authors of those
+additional source distributions.
+
+The actual script (update-archives.rb) was written by:
+
+Christopher Thielen (2006, 2012)
+Scott Biggart (Python update, ~2009)
