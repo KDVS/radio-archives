@@ -11,14 +11,15 @@
 
 require 'json'
 require 'net/http'
-require 'pp'
 
 ## Parameters
 
 # The URL of the schedule in the documented JSON format (see README)
 schedule_url = "http://library.kdvs.org/ajax/streamingScheduleJSON"
 # Streaming URL to rip
-stream_url = "http://127.0.0.1:8000/kdvs192"
+HOST = "169.237.101.239"
+PORT = 8000
+PATH = "/kdvs192"
 # An optional blocklist of show titles not to archive
 show_blocklist = ["Joe Frank", "Democracy Now: The War & Peace Report", "Free Speech Radio News"]
 
@@ -31,7 +32,7 @@ def check_requirements
     abort
   end
   # fResync is recommended by fIcy before tagging
-  if which('fReSync') == nil
+  if which('fResync') == nil
     puts "You do not appear to have fResync installed. Please correct this."
     puts "A copy of fResync (included with fIcy) is located in the tools/ directory of this script's source distribution."
     abort
@@ -49,9 +50,12 @@ def generate_cronjob(show)
   dj_names = show["dj_names"].nil? ? "Unspecified" : show["dj_names"]
   show_name = show["show_name"].nil? ? "Untitled" : show["show_name"]
 
-  filename = dj_names + " - " + show_name + " (Monday, July 23, 2012).mp3"
+  filename = "#{dj_names} - #{show_name}.mp3"
+  cron_timestamp = "#{show["start_min"]} #{show["start_hour"]} * * #{show["dotw"]}"
+  duration = (show["end_hour"].to_i * 60) + show["end_min"].to_i - (show["start_hour"].to_i * 60) + show["start_min"].to_i
 
-  pp filename
+  command = "#{cron_timestamp} #{which('fIcy')} -s .mp3 -M #{duration}m -o \"/tmp/#{filename}\" -d #{HOST} #{PORT} #{PATH}"
+  print command + "\n"
 end
 
 # Cross-platform way of finding an executable in the $PATH.
