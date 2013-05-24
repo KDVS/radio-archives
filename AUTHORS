@@ -4,5 +4,5 @@ additional source distributions.
 
 The actual script (update-archives.rb) was written by:
 
-Christopher Thielen (2006, 2012)
+Christopher Thielen (Original Perl script 2006, *this* Ruby script 2012-2013)
 Scott Biggart (Python update, ~2009)
