@@ -14,6 +14,11 @@ unless ARGV.length == 1
 end
 
 s = Show.find_by_id(ARGV[0])
+if s.nil?
+  puts "Could not find show with ID #{ARGV[0]}\n"
+  exit
+end
+
 r = Recording.new
 r.show = s
 r.started = Time.now
